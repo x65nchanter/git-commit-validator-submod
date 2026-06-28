@@ -1,0 +1,63 @@
+# ==============================================================================
+# GITHUB ACTIONS CONTINUOUS INTEGRATION PIPELINE MANIFEST
+# ==============================================================================
+# Description: Orchestrates automated test suite matrices across heterogeneous
+#              operating system nodes (Ubuntu Linux and Windows Server).
+# ==============================================================================
+name: Repository Validation Pipeline
+
+# Operational triggers: Execute workflows on upstream code pushes or pull requests
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# Enforce clean pipeline terminations if a newer execution sequence is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # PIPELINE STREAM 1: POSIX RUNTIME VALIDATION (CONTAINERIZED BATS / BASH)
+  # ============================================================================
+  linux-runtime-verification:
+    name: Execute POSIX Bash Verification Matrix
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code Target
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Invoke Containerized Bats Testing Specification Runner
+        uses: docker://bats/bats:latest
+        with:
+          args: "--pretty /github/workspace/test"
+
+  # ============================================================================
+  # PIPELINE STREAM 2: WINDOWS RUNTIME VALIDATION (POWERSHELL / PESTER)
+  # ============================================================================
+  windows-runtime-verification:
+    name: Execute Native Windows PowerShell Matrix
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code Target
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Force Upgrade to Modern Pester 5 Suite
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser
+
+      - name: Invoke Pester Testing Specification Runner
+        shell: pwsh
+        run: |
+          # Re-importing ensures the freshly installed user module takes precedence
+          Import-Module Pester -Force
+          Invoke-Pester -Path ./tests/install.Tests.ps1 -Output Detailed
