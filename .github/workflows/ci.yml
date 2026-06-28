@@ -6,24 +6,22 @@
 # ==============================================================================
 name: Repository Validation Pipeline
 
-# Operational triggers: Execute workflows on upstream code pushes or pull requests
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
 
-# Enforce clean pipeline terminations if a newer execution sequence is triggered
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   # ============================================================================
-  # PIPELINE STREAM 1: POSIX RUNTIME VALIDATION (CONTAINERIZED BATS / BASH)
+  # PIPELINE STREAM 1: POSIX RUNTIME VALIDATION (CONTAINERIZED SHELLSPEC)
   # ============================================================================
   linux-runtime-verification:
-    name: Execute POSIX Bash Verification Matrix
+    name: Execute POSIX Shell Verification Matrix
     runs-on: ubuntu-latest
 
     steps:
@@ -32,10 +30,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Invoke Containerized Bats Testing Specification Runner
-        uses: docker://bats/bats:latest
+      - name: Invoke Containerized ShellSpec Testing Suite Runner
+        uses: docker://shellspec/shellspec:kcov
         with:
-          args: "--pretty /github/workspace/test"
+          args: "--chdir /github/workspace /github/workspace/spec/"
 
   # ============================================================================
   # PIPELINE STREAM 2: WINDOWS RUNTIME VALIDATION (POWERSHELL / PESTER)
