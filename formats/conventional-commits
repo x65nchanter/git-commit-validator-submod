@@ -1,0 +1,90 @@
+#!/usr/bin/env sh
+
+# ==============================================================================
+# CONVENTIONAL COMMITS VALIDATION STRATEGY (POSIX TERMINAL COMPLIANT)
+# ==============================================================================
+
+validate_format() {
+    local message="$1"
+
+    # Extract the header line
+    local header
+    header=$(echo "$message" | head -n 1)
+
+    # --------------------------------------------------------------------------
+    # DIRECTIVE 4: Format structure and lowercase check
+    # --------------------------------------------------------------------------
+    # FIXED: Replaced brittle 'expr' with rock-solid POSIX 'echo | grep -E'
+    # Extended Regex handles capturing groups, '+' quantifiers, and '^' anchors perfectly
+    local structural_regex="^(feat|fix|chore|docs|style|refactor|perf|test|ci|build)(\([a-z0-9_-]+\))?!?: .+"
+    if ! echo "$header" | grep -E "$structural_regex" >/dev/null 2>&1; then
+        echo -e "\033[31m[VALIDATION ERROR] Header syntax mismatch or uppercase chars detected in type/scope.\033[0m"
+        return 1
+    fi
+
+    # --------------------------------------------------------------------------
+    # DIRECTIVE 2: 50-character header constraint and trailing period check
+    # --------------------------------------------------------------------------
+    if [ "${#header}" -gt 50 ]; then
+        echo -e "\033[31m[VALIDATION ERROR] Header length exceeds constraint (${#header}/50 characters).\033[0m"
+        return 1
+    fi
+
+    # FIXED: Replaced trailing period expr logic with POSIX grep evaluation
+    if echo "$header" | grep -E "\.$" >/dev/null 2>&1; then
+        echo -e "\033[31m[VALIDATION ERROR] Header violates styling: Trailing periods are forbidden.\033[0m"
+        return 1
+    fi
+
+    # Check for multi-line block payloads (Body / Footer processing)
+    local total_lines
+    total_lines=$(echo "$message" | wc -l)
+
+    if [ "$total_lines" -gt 1 ]; then
+        # ----------------------------------------------------------------------
+        # DIRECTIVE 3: Double line-break body decoupling validation
+        # ----------------------------------------------------------------------
+        local second_line
+        second_line=$(echo "$message" | sed -n '2p')
+
+        if [ -n "$second_line" ]; then
+            echo -e "\033[31m[VALIDATION ERROR] Structural violation: Header must be decoupled from the body via an empty line.\033[0m"
+            return 1
+        fi
+
+        # ----------------------------------------------------------------------
+        # DIRECTIVE 3 (PART 2): 72-character wrap constraint loop
+        # ----------------------------------------------------------------------
+        local line_index=3
+        local body_lines
+        body_lines=$(echo "$message" | tail -n +3)
+
+        while IFS= read -r current_line || [ -n "$current_line" ]; do
+            if [ "${#current_line}" -gt 72 ]; then
+                echo -e "\033[31m[VALIDATION ERROR] Line $line_index within the Body/Footer block exceeds the 72-character boundary limit (${#current_line}/72).\033[0m"
+                return 1
+            fi
+            line_index=$((line_index + 1))
+        done <<EOF
+$body_lines
+EOF
+    fi
+
+    return 0
+}
+
+print_format_specification_hint() {
+    echo -e "\n\033[33m[REMEDIAL SPECIFICATION MATRIX]\033[0m"
+    echo -e "1. \033[32mHeader Layout\033[0m   -> <type>(<scope>): <description> (All lowercase type/scope prefix)"
+    echo -e "2. \033[32mHeader Limit\033[0m    -> Maximum 50 characters. Do NOT append a trailing period \".\""
+    echo -e "3. \033[32mDecoupling\033[0m      -> Separate the header from the body block with exactly ONE empty line."
+    echo -e "4. \033[32mBody Wrap\033[0m       -> Every line within the optional Body/Footer block must be <= 72 characters."
+    echo -e "\nProduction Template Example:"
+    echo -e "  \033[36mfeat(client): add baritone api integration\n"
+    echo -e "  Detailed body text explaining the architectural motivation behind this\n  change must be wrapped manually at 72 characters per line max.\n"
+    echo -e "  Fixes: #105\033[0m\n"
+}
+
+function_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
