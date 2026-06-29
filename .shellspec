@@ -1,3 +1,5 @@
 --banner
 --color
---require spec_helper
+--default-path "spec/ deploy/"
+--execdir @basedir
+--format documentation

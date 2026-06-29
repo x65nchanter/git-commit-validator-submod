@@ -1,1 +1,6 @@
 .scripts/
+.test_sandbox/
+coverage/
+report/
+.shellspec-quick.log
+.shellspec-local

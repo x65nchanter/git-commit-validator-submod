@@ -10,16 +10,18 @@ The project adheres to a strict Strategy Pattern design layer. The file system s
 
 ```text
 git-commit-validator-submod/
-├── hooks/
-│   └── commit-msg         # Intercepts the Git pipeline and routes verification.
-├── formats/               # Strategy Module Directory (Validation Plugins)
-│   └── conventional-commits    # Active profile plugin for Conventional Commits validation.
-├── tests/                 # Test Coverage layer
-│   ├── test_helper/       # Downstream submodules (e.g., Bats testing framework framework).
-│   └── conventional_commits.bats  # Automated functional test matrices.
-├── install.sh             # Unified Bash deployment runner (Linux / macOS).
-├── install.ps1            # Unified PowerShell deployment runner (Windows).
-└── run_tests.sh           # Main automated test orchestration tool.
+├── bin/                     # Executable tools and scripts
+├── deploy/                 # Deployment scripts and test suites
+│   ├── install.sh          # Unified Bash deployment runner (Linux / macOS)
+│   ├── install.Tests.ps1   # Unified PowerShell deployment runner (Windows)
+│   └── install_spec.sh     # ShellSpec test suite for deployment
+├── docs/                    # Documentation
+├── lib/                     # Shared libraries and utility functions
+├── spec/                   # Tool logic test suites
+│   ├── spec_helper.sh      # Shared test helpers
+│   └── ...                 # Tool-specific logic tests
+├── .github/                # CI/CD workflows
+└── .shellspec              # ShellSpec global configuration
 ```
 
 ---
@@ -34,21 +36,20 @@ To execute tests within an isolated Linux environment regardless of your host Op
 Execute this pipeline sequence using **Podman** or **Docker**:
 
 ```powershell
-podman run --rm -v ".:/workspace:Z" -w /workspace shellspec/shellspec --chdir /workspace spec/
+podman run --rm -v ".:/workspace:Z" -w /workspace shellspec/shellspec
 ```
 
 ### POSIX Native Environment (Linux / macOS)
 Grant execution access and invoke the primary automated orchestrator tool natively:
 
 ```bash
-chmod +x run_tests.sh
-./run_tests.sh
+shellspec
 ```
 
 ### Windows Native Environment (PowerShell Prerequisites)
 Before running the native Windows test suite, ensure your local environment is upgraded to **Pester v5+**. The legacy version (v3.4) bundled with Windows will reject the modern assertion syntax.
 
-Run this update command inside your `pwsh` terminal:
+Update Pester to v5 version:
 ```powershell
 Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser
 ```
@@ -64,8 +65,8 @@ Invoke-Pester ./install.Tests.ps1
 
 ## Development Engineering Directives
 
-When modifying hooks runtime files or provisioning a new verification profile plugin inside the `formats/` subdirectory, ensure strict compliance with these paradigms:
+When modifying hooks runtime files or provisioning a new verification profile plugin inside the `lib/formats/` subdirectory, ensure strict compliance with these paradigms:
 
-1.  **POSIX Standards:** The hooks (`hooks/commit-msg`) and formatting modules must utilize pure POSIX-compliant Bash syntax. Avoid regional or non-standard shell wrappers.
-2.  **Strategy Decoupling:** Do NOT hardcode regular expressions inside the `hooks/` folder. All custom parsing layouts must be contained inside isolated strategy modules within `formats/` exposing the `validate_format` interface.
+1.  **POSIX Standards:** The hooks (`bin/.githooks/commit-msg`) and formatting modules must utilize pure POSIX-compliant Bash syntax. Avoid regional or non-standard shell wrappers.
+2.  **Strategy Decoupling:** Do NOT hardcode regular expressions inside the `bin/.githooks/` folder. All custom parsing layouts must be contained inside isolated strategy modules within `lib/formats/` exposing the `validate_format` interface.
 3.  **Local subshell mitigation:** When processing multi-line structures or buffers, loop using input streams or process substitutions (`while read ... done < <(command)`), instead of piping via stdout (`command | while read`), to protect return code pipeline delivery states.
