@@ -30,6 +30,15 @@ jobs:
         with:
           submodules: recursive
 
+      - name: CI/CD FILE STRUCTURE DIAGNOSTICS
+        run: |
+          echo "=== ТЕКУЩИЙ КАТАЛОГ РАННЕРА ==="
+          pwd
+          echo "=== ФАЙЛЫ В КОРНЕ РЕПОЗИТОРИЯ ==="
+          ls -la
+          echo "=== ФАЙЛЫ В ПАПКЕ DEPLOY ==="
+          ls -la deploy/
+
       - name: Invoke Project Verification (ShellSpec)
         uses: docker://shellspec/shellspec:latest
         with:
