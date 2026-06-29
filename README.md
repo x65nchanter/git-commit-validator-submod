@@ -22,12 +22,12 @@ Execute the appropriate command in your terminal **strictly from the root direct
 
 ### On Windows (PowerShell / pwsh):
 ```powershell
-irm https://raw.githubusercontent.com/x65nchanter/git-commit-validator-submod/refs/heads/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/x65nchanter/git-commit-validator-submod/refs/heads/main/deploy/install.ps1 | iex
 ```
 
 ### On Linux / macOS (Bash):
 ```bash
-curl -sSL https://raw.githubusercontent.com/x65nchanter/git-commit-validator-submod/refs/heads/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/x65nchanter/git-commit-validator-submod/refs/heads/main/deploy/install.sh | bash
 ```
 
 ---
