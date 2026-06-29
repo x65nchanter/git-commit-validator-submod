@@ -41,13 +41,11 @@ jobs:
 
       - name: Invoke Project Verification (ShellSpec)
         uses: docker://shellspec/shellspec:latest
-        with:
-          args: "--chdir /github/workspace"
 
       - name: Invoke Shell Deployment Verification (ShellSpec)
         uses: docker://shellspec/shellspec:latest
         with:
-          args: "--chdir /github/workspace deploy/"
+          args: "deploy/"
 
   # ============================================================================
   # PIPELINE STREAM 2: WINDOWS RUNTIME VALIDATION (POWERSHELL / PESTER)
