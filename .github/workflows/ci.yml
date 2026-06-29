@@ -30,6 +30,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Simulate Installation (Copy Script to Root)
+        run: |
+          cp deploy/install.sh install.sh
+          chmod +x install.sh
+
       - name: Invoke Project Verification (ShellSpec)
         uses: docker://shellspec/shellspec:latest
         with:
