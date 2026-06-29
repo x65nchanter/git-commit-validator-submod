@@ -12,10 +12,8 @@ Describe "Git Commit Validator Windows Installer Specification" {
     }
 
     AfterAll {
-        # Return terminal context to avoid PowerShell holding a handle on the directory
         if ($PSScriptRoot) { Set-Location $PSScriptRoot }
 
-        # Secure and clean removal of the temporary directory execution context
         if (Test-Path $Script:SandboxPath) {
             Remove-Item $Script:SandboxPath -Recurse -Force
         }
@@ -32,27 +30,19 @@ Describe "Git Commit Validator Windows Installer Specification" {
         Pop-Location
     }
 
-    It "Should invoke the installation process and maintain stability when executed on a repository with a pre-installed module hook" {
-        Push-Location $Script:SandboxPath
-        Throw NotImplemented
-        Pop-Location
+    It "Should invoke the installation process and maintain stability when executed on a repository with a pre-installed module hook" -Pending {
+
     }
 
-    It "Should invoke the installation process and link the validation rules via the MANUAL hook integration strategy" {
-        Push-Location $Script:SandboxPath
-        Throw NotImplemented
-        Pop-Location
+    It "Should invoke the installation process and link the validation rules via the MANUAL hook integration strategy" -Pending {
+
     }
 
-    It "Should invoke the installation process and wrap the pre-existing hook via the BEFORE integration strategy to execute validation upstream" {
-        Push-Location $Script:SandboxPath
-        Throw NotImplemented
-        Pop-Location
+    It "Should invoke the installation process and wrap the pre-existing hook via the BEFORE integration strategy to execute validation upstream" -Pending {
+
     }
 
-    It "Should invoke the installation process and wrap the pre-existing hook via the AFTER integration strategy to execute validation downstream" {
-        Push-Location $Script:SandboxPath
-        Throw NotImplemented
-        Pop-Location
+    It "Should invoke the installation process and wrap the pre-existing hook via the AFTER integration strategy to execute validation downstream" -Pending {
+
     }
 }

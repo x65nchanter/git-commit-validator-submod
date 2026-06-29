@@ -3,42 +3,56 @@
 # ==============================================================================
 
 Describe 'Git Commit Validator Deployment'
-    Before() {
+    prepare_sandbox() {
+        SANDBOX_DIR=$(mktemp -d)
+        export SANDBOX_DIR
+
+        cd "$SANDBOX_DIR" || exit 1
+
+        mkdir -p .git
+
+        mkdir -p ./deploy
+        cp "$SHELLSPEC_PROJECT_ROOT/deploy/install.sh" "install.sh"
+
         export _HOOK_CONTENT=$(date +%s%N)
-        export _EXPECTED_HOOKS_PATH=""
-        export _EXPECTED_VALIDATOR_FORMAT=""
+        : > "git_calls.log"
     }
 
+    cleanup_sandbox() {
+        if [ -n "$SANDBOX_DIR" ] && [ -d "$SANDBOX_DIR" ]; then
+            rm -rf "$SANDBOX_DIR"
+        fi
+    }
+
+    BeforeEach 'prepare_sandbox'
+
+    AfterEach 'cleanup_sandbox'
+
     Mock git
+        echo "git call: $*" >> "./git_calls.log"
+
         case "$*" in
             *submodule*add*)
             mkdir -p .submodules/git-commit-validator-submod/hooks/
-            touch .submodules/git-commit-validator-submod/hooks/commit-msg
             echo "$_HOOK_CONTENT" > .submodules/git-commit-validator-submod/hooks/commit-msg
             ;;
         esac
-
-        case "$*" in
-            *config*local.core.hooksPath*)
-            _EXPECTED_HOOKS_PATH=$(echo "$*" | awk '{print $NF}')
-            ;;
-            *config*local.commitValidator.format*)
-            _EXPECTED_VALIDATOR_FORMAT=$(echo "$*" | awk '{print $NF}')
-            ;;
-        esac
-
-        echo "mocked git call: $*"
         return 0
     End
 
     It 'Should invoke the installation process and deploy the hook into a repository without pre-existing hooks'
-        When run script "install.sh" "conventional-commits"
+        When run script install.sh "conventional-commits"
+
+        The output should be present
         The status should be success
-        The directory ".githooks" should be exist
-        The file ".githooks/commit-msg" should be exist
-        The variable _EXPECTED_HOOKS_PATH should equal ".githooks"
-        The variable _EXPECTED_VALIDATOR_FORMAT should equal "conventional-commits"
-        The contents of file ".githooks/commit-msg" should equal _HOOK_CONTENT
+
+        The path ".githooks" should be exist
+        The path ".githooks/commit-msg" should be exist
+
+        The contents of file "git_calls.log" should include "git call: config local.core.hooksPath .githooks"
+        The contents of file "git_calls.log" should include "git call: config local.commitValidator.format conventional-commits"
+
+        The contents of file ".githooks/commit-msg" should equal "$_HOOK_CONTENT"
     End
 
     Todo 'Should invoke the installation process and maintain stability when executed on a repository with a pre-installed module hook'
