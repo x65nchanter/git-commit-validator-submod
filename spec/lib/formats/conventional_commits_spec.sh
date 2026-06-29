@@ -3,7 +3,7 @@
 # ==============================================================================
 
 Describe 'Conventional Commits Formatting Specification Engine'
-  Include "formats/conventional-commits"
+  Include "lib/formats/conventional-commits"
 
   Describe 'With compliant commit message formatting profiles'
     It 'validates a compliant structural header configuration without a scope block'

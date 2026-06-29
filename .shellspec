@@ -1,5 +1,3 @@
 --banner
 --color
---default-path "spec/ deploy/"
---execdir @basedir
---format documentation
+--format d

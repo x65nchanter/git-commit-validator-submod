@@ -30,10 +30,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Invoke Containerized ShellSpec Testing Suite Runner
-        uses: docker://shellspec/shellspec:kcov
+      - name: Invoke Project Verification (ShellSpec)
+        uses: docker://shellspec/shellspec:latest
         with:
-          args: "--chdir /github/workspace /github/workspace/spec/"
+          args: "--chdir /github/workspace"
+
+      - name: Invoke Shell Deployment Verification (ShellSpec)
+        uses: docker://shellspec/shellspec:latest
+        with:
+          args: "--chdir /github/workspace deploy/"
 
   # ============================================================================
   # PIPELINE STREAM 2: WINDOWS RUNTIME VALIDATION (POWERSHELL / PESTER)
@@ -48,14 +53,9 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Force Upgrade to Modern Pester 5 Suite
+      - name: Invoke PowerShell Deployment Verification (Pester)
         shell: pwsh
         run: |
           Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser
-
-      - name: Invoke Pester Testing Specification Runner
-        shell: pwsh
-        run: |
-          # Re-importing ensures the freshly installed user module takes precedence
           Import-Module Pester -Force
-          Invoke-Pester -Path ./tests/install.Tests.ps1 -Output Detailed
+          Invoke-Pester -Path ./deploy/install.Tests.ps1 -Output Detailed

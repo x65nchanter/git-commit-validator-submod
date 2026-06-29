@@ -30,35 +30,37 @@ git-commit-validator-submod/
 
 To ensure backward compatibility and protect runtime stability across updates, all functional changes must pass the internal automated verification suites.
 
-### Isolated Container Verification (Recommended for Cross-Platform Dev)
-To execute tests within an isolated Linux environment regardless of your host Operating System (Windows or Linux), leverage the local OCI-compliant container configuration.
-
-Execute this pipeline sequence using **Podman** or **Docker**:
-
-```powershell
-podman run --rm -v ".:/workspace:Z" -w /workspace shellspec/shellspec
-```
-
-### POSIX Native Environment (Linux / macOS)
-Grant execution access and invoke the primary automated orchestrator tool natively:
-
+### Project Verification
+Verify the core validator functionality and rule specifications. On POSIX-compliant systems, invoke the primary automated orchestrator natively:
 ```bash
 shellspec
 ```
 
-### Windows Native Environment (PowerShell Prerequisites)
-Before running the native Windows test suite, ensure your local environment is upgraded to **Pester v5+**. The legacy version (v3.4) bundled with Windows will reject the modern assertion syntax.
-
-Update Pester to v5 version:
+To ensure consistency across diverse host environments, leverage an OCI-compliant container to execute the verification suite in an isolated Linux workspace:
 ```powershell
-Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser
+podman run --rm -v ".:/src:Z" shellspec/shellspec
 ```
 
-Once updated, trigger the test suite specification matrix:
+### Shell Deployment Verification
+Validate the integrity of the deployment scripts and lifecycle workflows. Execute the verification suite natively via:
+```bash
+shellspec deploy/
+```
+
+Alternatively, perform validation within a containerized environment to simulate deployment behavior:
 ```powershell
-# Re-importing ensures the freshly installed user module takes precedence
-Import-Module Pester -Force
-Invoke-Pester ./install.Tests.ps1
+podman run --rm -v ".:/src:Z" shellspec deploy/
+```
+
+### PowerShell Deployment Verification
+Verify the Windows installer specifications and deployment logic. Invoke the Pester test suite natively:
+```powershell
+Invoke-Pester ./deploy/install.Tests.ps1
+```
+
+Alternatively, perform validation within a containerized environment to simulate deployment behavior:
+```powershell
+podman run --rm -v ".:/src:Z" -w /src mcr.microsoft.com/powershell:latest pwsh -Command "Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser; Import-Module Pester -Force; Invoke-Pester -Path ./deploy/install.Tests.ps1 -Output Detailed"
 ```
 
 ---
