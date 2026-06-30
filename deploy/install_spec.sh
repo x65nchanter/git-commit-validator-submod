@@ -14,9 +14,8 @@ Describe 'Git Commit Validator Deployment'
         mkdir -p ./deploy
         cp "$SHELLSPEC_PROJECT_ROOT/deploy/install.sh" "$SANDBOX_DIR/install.sh"
 
-        cat "$SANDBOX_DIR/install.sh"
-        cat "install.sh"
-        pwd
+        chmod +x "$SANDBOX_DIR/install.sh"
+
         export _HOOK_CONTENT=$(date +%s%N)
         : > "git_calls.log"
     }
