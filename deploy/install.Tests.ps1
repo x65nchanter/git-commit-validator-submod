@@ -24,7 +24,7 @@ Describe "Git Commit Validator Windows Installer Specification" {
 
         { .\install.ps1 -ProfileName "conventional-commits" } | Should -Not -Throw
 
-        Should -Invoke -CommandName 'git' -Exactly -Times 1 -ParameterFilter { "$args" -match 'config local.core.hooksPath .githooks' }
+        Should -Invoke -CommandName 'git' -Exactly -Times 1 -ParameterFilter { "$args" -match 'config local.core.hooksPath $GIT_DIR/hooks' }
         Should -Invoke -CommandName 'git' -Exactly -Times 1 -ParameterFilter { "$args" -match 'config local.commitValidator.format conventional-commits' }
 
         Pop-Location

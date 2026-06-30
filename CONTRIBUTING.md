@@ -69,6 +69,6 @@ podman run --rm -v ".:/src:Z" -w /src mcr.microsoft.com/powershell:latest pwsh -
 
 When modifying hooks runtime files or provisioning a new verification profile plugin inside the `lib/formats/` subdirectory, ensure strict compliance with these paradigms:
 
-1.  **POSIX Standards:** The hooks (`bin/.githooks/commit-msg`) and formatting modules must utilize pure POSIX-compliant Bash syntax. Avoid regional or non-standard shell wrappers.
-2.  **Strategy Decoupling:** Do NOT hardcode regular expressions inside the `bin/.githooks/` folder. All custom parsing layouts must be contained inside isolated strategy modules within `lib/formats/` exposing the `validate_format` interface.
+1.  **POSIX Standards:** The hooks (`bin/hooks/commit-msg`) and formatting modules must utilize pure POSIX-compliant Bash syntax. Avoid regional or non-standard shell wrappers.
+2.  **Strategy Decoupling:** Do NOT hardcode regular expressions inside the `bin/hooks/` folder. All custom parsing layouts must be contained inside isolated strategy modules within `lib/formats/` exposing the `validate_format` interface.
 3.  **Local subshell mitigation:** When processing multi-line structures or buffers, loop using input streams or process substitutions (`while read ... done < <(command)`), instead of piping via stdout (`command | while read`), to protect return code pipeline delivery states.

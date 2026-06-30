@@ -7,28 +7,21 @@
 #              configuration payload.
 # ==============================================================================
 
-# Halt execution immediately if any decoupled pipelined step fails
 set -e
 
-# Extract the filesystem path of the temporary commit message payload
 COMMIT_MSG_FILE="$1"
 COMMIT_MSG_CONTENT=$(cat "$COMMIT_MSG_FILE")
 
-# Define target architectural directory structures
 HOOKS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FORMATS_DIR="$HOOKS_DIR/../formats"
 
-# Bypass validation protocols for upstream automated actions (Merges/Reverts)
-if [[ "$COMMIT_MSG_CONTENT" =~ ^(Merge|Revert|Initial) ]]; then
+if [[ "$COMMIT_MSG_CONTENT" =~ ^(Revert|Merge) ]]; then
     exit 0
 fi
 
-# Retrieve the active validation runtime strategy from the local Git configuration
-# Fallback default: 'conventional-commits' spec
 ACTIVE_FORMAT=$(git config local.commitValidator.format || echo "conventional-commits")
 TARGET_STRATEGY_SCRIPT="$FORMATS_DIR/${ACTIVE_FORMAT}"
 
-# Verify the structural existence of the specified formatting module
 if [ ! -f "$TARGET_STRATEGY_SCRIPT" ]; then
     echo -e "\n\033[31m[ERROR] Runtime execution failed: Invalid validation strategy.\033[0m"
     echo -e "The requested strategy configuration module \033[33m'$ACTIVE_FORMAT'\033[0m does not exist."
@@ -37,17 +30,13 @@ if [ ! -f "$TARGET_STRATEGY_SCRIPT" ]; then
     exit 1
 fi
 
-# Dynamically link and source the selected formatting strategy module
 source "$TARGET_STRATEGY_SCRIPT"
 
-# Execute the validation function declared inside the sourced strategy interface
-# Expected return value: 0 for success, non-zero for architectural violation
 if ! validate_format "$COMMIT_MSG_CONTENT"; then
     echo -e "\n\033[31m[ERROR] Commit rejected: Structural specification violation.\033[0m"
     echo -e "Active validation profile: \033[36m$ACTIVE_FORMAT\033[0m"
     echo -e "Captured input string: \033[33m$COMMIT_MSG_CONTENT\033[0m"
 
-    # Check if a custom contextual usage hint was exposed by the strategy module
     if function_exists print_format_specification_hint; then
         print_format_specification_hint
     else
@@ -56,5 +45,4 @@ if ! validate_format "$COMMIT_MSG_CONTENT"; then
     exit 1
 fi
 
-# Exit successfully, allowing the Git pipeline to complete the commit execution
 exit 0

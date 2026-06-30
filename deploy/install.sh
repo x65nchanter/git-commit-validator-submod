@@ -18,27 +18,29 @@ if [ ! -d ".git" ]; then
 fi
 
 SELECTED_PROFILE="${1:-conventional\-commits}"
-REPO_ROOT=$(cd "$(dirname "$0")" && pwd)
+GIT_DIR=$(git rev-parse --absolute-git-dir)
 
 echo -e "\033[33m[*] Registering and linking downstream Git submodule...\033[0m"
-git submodule add --force https://github.com/x65nchanter/git-commit-validator-submod .submodules/git-commit-validator-submod 2>/dev/null || true
-git submodule update --init --recursive -- .submodules/git-commit-validator-submod
+git submodule add --force https://github.com/x65nchanter/git-commit-validator-submod $GIT_DIR/modules/git-commit-validator-submod 2>/dev/null || true
+git submodule update --init --recursive -- $GIT_DIR/modules/git-commit-validator-submod
 
-if [ ! -d ".githooks" ]; then
-    mkdir -p .githooks
+
+if [ ! -d "$GIT_DIR/hooks" ]; then
+    mkdir -p $GIT_DIR/hooks
 fi
 
-if [ -f "$REPO_ROOT/.submodules/git-commit-validator-submod/hooks/commit-msg" ]; then
-    ln -sf $REPO_ROOT/.submodules/git-commit-validator-submod/hooks/commit-msg $REPO_ROOT/.githooks/commit-msg
+if [ -f "$GIT_DIR/modules/git-commit-validator-submod/hooks/commit-msg" ]; then
+    ln -sf $GIT_DIR/modules/git-commit-validator-submod/hooks/commit-msg $GIT_DIR/hooks/commit-msg
 fi
 
-if [ -f "$REPO_ROOT/.githooks/commit-msg" ]; then
-    chmod +x $REPO_ROOT/.githooks/commit-msg
-    chmod +x $REPO_ROOT/.submodules/git-commit-validator-submod/formats/* 2>/dev/null || true
+
+if [ -f "$GIT_DIR/hooks/commit-msg" ]; then
+    chmod +x $GIT_DIR/hooks/commit-msg
+    chmod +x $GIT_DIR/modules/git-commit-validator-submod/formats/* 2>/dev/null || true
 fi
 
 echo -e "\033[33m[*] Mapping local core.hooksPath configuration to submodule directory...\033[0m"
-git config local.core.hooksPath ".githooks"
+git config local.core.hooksPath "$GIT_DIR/hooks"
 
 echo -e "\033[33m[*] Provisioning active profile: '$SELECTED_PROFILE'...\033[0m"
 git config local.commitValidator.format "$SELECTED_PROFILE"

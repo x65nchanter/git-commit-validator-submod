@@ -35,8 +35,8 @@ Describe 'Git Commit Validator Deployment'
 
         case "$*" in
             *submodule*add*)
-            mkdir -p .submodules/git-commit-validator-submod/hooks/
-            echo "$_HOOK_CONTENT" > .submodules/git-commit-validator-submod/hooks/commit-msg
+            mkdir -p $GIT_DIR/modules/git-commit-validator-submod/hooks/
+            echo "$_HOOK_CONTENT" > $GIT_DIR/modules/git-commit-validator-submod/hooks/commit-msg
             ;;
         esac
         return 0
@@ -48,13 +48,13 @@ Describe 'Git Commit Validator Deployment'
         The output should be present
         The status should be success
 
-        The path ".githooks" should be exist
-        The path ".githooks/commit-msg" should be exist
+        The path "$GIT_DIR/hooks" should be exist
+        The path "$GIT_DIR/hooks/commit-msg" should be exist
 
-        The contents of file "git_calls.log" should include "git call: config local.core.hooksPath .githooks"
+        The contents of file "git_calls.log" should include "git call: config local.core.hooksPath $GIT_DIR/hooks"
         The contents of file "git_calls.log" should include "git call: config local.commitValidator.format conventional-commits"
 
-        The contents of file ".githooks/commit-msg" should equal "$_HOOK_CONTENT"
+        The contents of file "$GIT_DIR/hooks/commit-msg" should equal "$_HOOK_CONTENT"
     End
 
     Todo 'Should invoke the installation process and maintain stability when executed on a repository with a pre-installed module hook'
