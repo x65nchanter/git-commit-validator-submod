@@ -25,7 +25,7 @@ A standardized formatting layout designed to enforce structural consistency acro
 | build | Changes affecting the root compilation layer, external tooling, or layout tasks | build(gradle): upgrade kotlin toolchain compiler target to jvm 21 |
 | ci | Modifications to CI/CD pipelines, container runtime orchestrations, or deploy scripts | ci(podman): fix volume mounting path for windows host |
 
-## The 4 Core Engineering Directives
+## Directives
 
 1. **Imperative Mood in Headers.**
    * Use action verbs: `add`, `fix`, `remove`, `change`.
@@ -34,14 +34,6 @@ A standardized formatting layout designed to enforce structural consistency acro
 2. **50-Character Header Constraint.** Keep descriptions precise, high-density, and omit trailing periods.
 3. **Double Line-Break Body Decoupling.** Separate the message header from the body with an empty line. The body text must articulate the technical **intent and motivation** behind the alteration, rather than the raw implementation layer. Enforce a strict **72-character limit per line** within the body block.
 4. **Lower-Case Convention.** The commit type and scope prefix components must be written exclusively in lower-case formats (e.g., `feat(client): ...`).
-
-## Enforced Commit Format
-
-The hook validates the first line (header) of your commit message. It must strictly conform to the following structural pattern:
-
-```text
-<type>(<scope>): <short description in imperative mood>
-```
 
 ### Example of Valid Commit:
 

@@ -1,5 +1,5 @@
 # ==============================================================================
-# CONVENTIONAL COMMITS SPECIFICATION TEST SUITE (SHELLSPEC PROFILE)
+# CONVENTIONAL COMMITS SPECIFICATION TEST SUITE
 # ==============================================================================
 
 Describe 'Conventional Commits Formatting Specification Engine'
@@ -12,7 +12,7 @@ Describe 'Conventional Commits Formatting Specification Engine'
     End
 
     It 'validates a compliant structural header featuring a scope block and breaking change marker'
-      When call validate_format "fix(client)!: resolve severe jvm runtime memory leak"
+      When call validate_format "fix(client)!: resolve severe runtime memory leak"
       The status should be success
     End
 
@@ -20,7 +20,7 @@ Describe 'Conventional Commits Formatting Specification Engine'
       local message_payload="feat(core): implement look process rotation
 
 This body block articulates the technical intent behind the adjustment
-and is safely wrapped beneath the strict 72-character threshold constraint."
+while adhering to the strict 72-character threshold constraint."
 
       When call validate_format "$message_payload"
       The status should be success

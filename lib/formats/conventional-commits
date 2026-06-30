@@ -14,8 +14,6 @@ validate_format() {
     # --------------------------------------------------------------------------
     # DIRECTIVE 4: Format structure and lowercase check
     # --------------------------------------------------------------------------
-    # FIXED: Replaced brittle 'expr' with rock-solid POSIX 'echo | grep -E'
-    # Extended Regex handles capturing groups, '+' quantifiers, and '^' anchors perfectly
     local structural_regex="^(feat|fix|chore|docs|style|refactor|perf|test|ci|build)(\([a-z0-9_-]+\))?!?: .+"
     if ! echo "$header" | grep -E "$structural_regex" >/dev/null 2>&1; then
         echo -e "\033[31m[VALIDATION ERROR] Header syntax mismatch or uppercase chars detected in type/scope.\033[0m"
@@ -30,13 +28,11 @@ validate_format() {
         return 1
     fi
 
-    # FIXED: Replaced trailing period expr logic with POSIX grep evaluation
     if echo "$header" | grep -E "\.$" >/dev/null 2>&1; then
         echo -e "\033[31m[VALIDATION ERROR] Header violates styling: Trailing periods are forbidden.\033[0m"
         return 1
     fi
 
-    # Check for multi-line block payloads (Body / Footer processing)
     local total_lines
     total_lines=$(echo "$message" | wc -l)
 
@@ -53,7 +49,7 @@ validate_format() {
         fi
 
         # ----------------------------------------------------------------------
-        # DIRECTIVE 3 (PART 2): 72-character wrap constraint loop
+        # DIRECTIVE 3: 72-character wrap constraint loop
         # ----------------------------------------------------------------------
         local line_index=3
         local body_lines
