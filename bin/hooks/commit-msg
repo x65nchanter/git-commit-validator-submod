@@ -19,7 +19,7 @@ if [[ "$COMMIT_MSG_CONTENT" =~ ^(Revert|Merge) ]]; then
     exit 0
 fi
 
-ACTIVE_FORMAT=$(git config local.commitValidator.format || echo "conventional-commits")
+ACTIVE_FORMAT=$(git config --local commitValidator.format || echo "conventional-commits")
 TARGET_STRATEGY_SCRIPT="$FORMATS_DIR/${ACTIVE_FORMAT}"
 
 if [ ! -f "$TARGET_STRATEGY_SCRIPT" ]; then

@@ -15,18 +15,27 @@ param (
 )
 
 $ErrorActionPreference = "Stop"
-$GIT_DIR = (git rev-parse --absolute-git-dir)
+
+if (-not (Get-Command git -ErrorAction Ignore)) {
+    throw "Git is not installed."
+}
 
 Write-Host "[*] Initializing 'git-commit-validator-submod' infrastructure..." -ForegroundColor Cyan
 
-if (-not (Test-Path -Path $GIT_DIR)) {
+$GIT_DIR = git rev-parse --absolute-git-dir
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Current directory is not a Git repository."
+}
+
+if (-not (Test-Path -PathType Container -Path $GIT_DIR)) {
     Write-Error "Deployment failed: Host environment is not a root Git repository.`nAction required: Execute this runner strictly from the target repository root."
     exit 1
 }
 
 Write-Host "[*] Registering and linking downstream Git submodule..." -ForegroundColor Yellow
-if (-not (Test-Path -Path "$GIT_DIR/modules/git-commit-validator-submod")) {
-    git submodule add --force https://github.com/x65nchanter/git-commit-validator-submod $GIT_DIR/modules/git-commit-validator-submod 2>$null
+if (-not (Test-Path -PathType Container -Path "$GIT_DIR/modules/git-commit-validator-submod")) {
+    git submodule add --force https://github.com/x65nchanter/git-commit-validator-submod $GIT_DIR/modules/git-commit-validator-submod
 }
 git submodule update --init --recursive -- $GIT_DIR/modules/git-commit-validator-submod
 
@@ -36,9 +45,9 @@ if (Test-Path -Path "$GIT_DIR/modules/git-commit-validator-submod/hooks/commit-m
 
 Write-Host "[*] Mapping local core.hooksPath configuration to submodule directory..." -ForegroundColor Yellow
 
-git config local.core.hooksPath "$GIT_DIR/hooks"
+git config --local core.hooksPath "$GIT_DIR/hooks"
 
 Write-Host "[*] Provisioning active profile: '$ProfileName'..." -ForegroundColor Yellow
-git config local.commitValidator.format $ProfileName
+git config --local commitValidator.format $ProfileName
 
 Write-Host "[SUCCESS] Deployment complete. The Git pipeline is now securely routed to the submodule hooks.`n" -ForegroundColor Green

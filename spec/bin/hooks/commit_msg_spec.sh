@@ -7,7 +7,7 @@ Describe 'Git Commit Validator Hook Execution'
     # unset _MOCK_GIT_FORMAT
     Mock git
         case "$*" in
-            *config*local.commitValidator.format*)
+            *config*--local*commitValidator.format*)
                 if [ -n "$_MOCK_GIT_FORMAT" ]; then
                     echo "$_MOCK_GIT_FORMAT"
                     return 0

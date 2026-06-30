@@ -51,8 +51,8 @@ Describe 'Git Commit Validator Deployment'
         The path "$GIT_DIR/hooks" should be exist
         The path "$GIT_DIR/hooks/commit-msg" should be exist
 
-        The contents of file "git_calls.log" should include "git call: config local.core.hooksPath $GIT_DIR/hooks"
-        The contents of file "git_calls.log" should include "git call: config local.commitValidator.format conventional-commits"
+        The contents of file "git_calls.log" should include "git call: config --local core.hooksPath $GIT_DIR/hooks"
+        The contents of file "git_calls.log" should include "git call: config --local commitValidator.format conventional-commits"
 
         The contents of file "$GIT_DIR/hooks/commit-msg" should equal "$_HOOK_CONTENT"
     End

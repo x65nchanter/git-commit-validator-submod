@@ -40,9 +40,9 @@ if [ -f "$GIT_DIR/hooks/commit-msg" ]; then
 fi
 
 echo -e "\033[33m[*] Mapping local core.hooksPath configuration to submodule directory...\033[0m"
-git config local.core.hooksPath "$GIT_DIR/hooks"
+git config --local core.hooksPath "$GIT_DIR/hooks"
 
 echo -e "\033[33m[*] Provisioning active profile: '$SELECTED_PROFILE'...\033[0m"
-git config local.commitValidator.format "$SELECTED_PROFILE"
+git config --local commitValidator.format "$SELECTED_PROFILE"
 
 echo -e "\033[32m[SUCCESS] Deployment complete. The Git pipeline is now securely routed to the submodule hooks.\033[0m\n"

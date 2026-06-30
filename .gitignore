@@ -1,4 +1,5 @@
 .scripts/
+.scratch/
 .test_sandbox/
 coverage/
 report/
