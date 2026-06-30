@@ -44,7 +44,7 @@ Describe 'Git Commit Validator Deployment'
     End
 
     It 'Should invoke the installation process and deploy the hook into a repository without pre-existing hooks'
-        When run script install.sh "conventional-commits"
+        When run script "$SANDBOX_DIR/install.sh" "conventional-commits"
 
         The output should be present
         The status should be success
